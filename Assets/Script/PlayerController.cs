@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class MyController : MonoBehaviour
 {
 
     [Header("Player")]
@@ -28,6 +28,9 @@ public class PlayerController : MonoBehaviour
     [Space(10)]
     [Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
     public float JumpTimeout = 0.50f;
+
+    //[Tooltip("Time required to pass before being able to dodge again. Set to 0f to instantly jump again")]
+  //  public float DodgeTimeout = 0.50f;
 
     [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
     public float FallTimeout = 0.15f;
@@ -67,6 +70,7 @@ public class PlayerController : MonoBehaviour
     // timeout deltatime
     private float _jumpTimeoutDelta;
     private float _fallTimeoutDelta;
+   // private float _dodgeDelta;
 
     // animation IDs
     private int _animIDSpeed;
@@ -84,7 +88,7 @@ public class PlayerController : MonoBehaviour
     public GameObject _mainCamera;
 
     public float sensitivity = 2.0f;
-    private float dodgeValue = 60f;
+    private float dodgeValue = 100f;
 
     private void Awake()
     {
@@ -106,16 +110,17 @@ public class PlayerController : MonoBehaviour
         // reset our timeouts on start
          _jumpTimeoutDelta = JumpTimeout;
          _fallTimeoutDelta = FallTimeout;
+        //_dodgeDelta = DodgeTimeout;
 
     }
 
     private void Update()
     {
         _hasAnimator = TryGetComponent(out _animator);
-
         JumpAndGravity();
         GroundedCheck();
         Move();
+        Attack();
     }
 
     private void AssignAnimationIDs()
@@ -125,7 +130,7 @@ public class PlayerController : MonoBehaviour
         _animIDJump = Animator.StringToHash("Jump");
         _animIDFreeFall = Animator.StringToHash("FreeFall");
         _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
-        _animIDDodge = Animator.StringToHash("Dodge");
+       // _animIDDodge = Animator.StringToHash("Dodge");
     }
 
       private void GroundedCheck()
@@ -193,6 +198,7 @@ public class PlayerController : MonoBehaviour
             _speed = targetSpeed;
         }
 
+
         _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
         if (_animationBlend < 0.01f) _animationBlend = 0f;
 
@@ -206,7 +212,6 @@ public class PlayerController : MonoBehaviour
 
      private void JumpAndGravity()
         {
-            Debug.Log("jump gravity ");
             if (Grounded)
             {
                 // reset the fall timeout timer
@@ -224,11 +229,10 @@ public class PlayerController : MonoBehaviour
                 {
                     _verticalVelocity = -2f;
                 }
-                Debug.Log("test basic ");
+
                 // Jump
                 if (_input.jump && _jumpTimeoutDelta <= 0.0f )
                 {
-                    Debug.Log("test test test ");
                     if(_input.move.x == 0){
                         // the square root of H * -2 * G = how much velocity needed to reach desired height
                         _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
@@ -236,28 +240,27 @@ public class PlayerController : MonoBehaviour
                         if (_hasAnimator)
                         {
                             _animator.SetBool(_animIDJump, true);
-                        }  
-                        Debug.Log("test jump basic ");
+                        }   
                     }else 
                        //Dodge(_input.move.x);
                           _input.jump = false;
                            Quaternion cameraRotation = Camera.main.transform.rotation;
                         if(_input.move.x < 0 ){
-                            Vector3 moveDirection = cameraRotation * Vector3.left;  //move forward
+                             Vector3 moveDirection = cameraRotation * Vector3.left;  //move forward
                             _controller.Move(moveDirection * Time.deltaTime * dodgeValue);
-                            Debug.Log("test dodge -------------------- ");
-                            if (_hasAnimator)
+                        //    Debug.Log("jump left test true ");
+                        /*    if (_hasAnimator)
                             {
                                 _animator.SetBool(_animIDDodge, true);
-                            }
-                        }else {
-                            Vector3 moveDirection = cameraRotation * Vector3.right;  //move forward
+                            }   */
+                        }else if (_input.move.x > 0 ) {
+                              Vector3 moveDirection = cameraRotation * Vector3.right;  //move forward
                             _controller.Move(moveDirection * Time.deltaTime * dodgeValue);
-                            Debug.Log("test dodge right ");
-                            if (_hasAnimator)
+                        //      Debug.Log("jump left test false ");
+                           /* if (_hasAnimator)
                             {
-                                _animator.SetBool(_animIDDodge, false);
-                            }
+                                _animator.SetBool(_animIDDodge, true);
+                            }*/
                         }
                     
                 }      
@@ -308,6 +311,10 @@ public class PlayerController : MonoBehaviour
             }else {
                 _controller.Move(new Vector3(0.0f, 0.0f, 10.0f) * Time.deltaTime);
             }
+        }
+
+        private void Attack(){
+            
         }
 
           private void OnFootstep(AnimationEvent animationEvent)
