@@ -14,6 +14,9 @@ public class MyController : MonoBehaviour
     [Tooltip("Sprint speed of the character in m/s")]
     public float SprintSpeed = 5.335f;
 
+    [Tooltip("Attack speed of the character in m/s")]
+    public float AttackSpeed = 2;
+
     [Tooltip("How fast the character turns to face movement direction")]
     [Range(0.0f, 0.3f)]
     public float RotationSmoothTime = 0.12f;
@@ -58,7 +61,7 @@ public class MyController : MonoBehaviour
     public bool forward = false;
 
     private bool _hasAnimator;
-
+   
     // player
     private float _speed;
     private float _animationBlend;
@@ -70,7 +73,7 @@ public class MyController : MonoBehaviour
     // timeout deltatime
     private float _jumpTimeoutDelta;
     private float _fallTimeoutDelta;
-   // private float _dodgeDelta;
+    private float _attackTimeoutDelta;
 
     // animation IDs
     private int _animIDSpeed;
@@ -78,7 +81,9 @@ public class MyController : MonoBehaviour
     private int _animIDJump;
     private int _animIDFreeFall;
     private int _animIDMotionSpeed;
-    private int _animIDDodge;
+    private int _animIDDodgeR;
+    private int _animIDDodgeL;
+    private int _animIDAutoAttack;
 
     private PlayerInput _playerInput;
 
@@ -88,7 +93,7 @@ public class MyController : MonoBehaviour
     public GameObject _mainCamera;
 
     public float sensitivity = 2.0f;
-    private float dodgeValue = 100f;
+    private float dodgeValue = 500f;
 
     private void Awake()
     {
@@ -130,7 +135,9 @@ public class MyController : MonoBehaviour
         _animIDJump = Animator.StringToHash("Jump");
         _animIDFreeFall = Animator.StringToHash("FreeFall");
         _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
-       // _animIDDodge = Animator.StringToHash("Dodge");
+        _animIDDodgeR = Animator.StringToHash("RightDodge");
+        _animIDDodgeL = Animator.StringToHash("LeftDodge");
+        _animIDAutoAttack = Animator.StringToHash("AutoAttack");
     }
 
       private void GroundedCheck()
@@ -153,9 +160,9 @@ public class MyController : MonoBehaviour
 
         float mouseX = Input.GetAxis("Mouse X"); // get mouse x for rotation
 
-        Vector3 rotateDirection = Vector3.up * mouseX; 
+        Vector3 rotateDirectionX = Vector3.up * mouseX;
 
-        transform.Rotate(Vector3.up * mouseX * sensitivity);  //camera follow x rotation
+        transform.Rotate(rotateDirectionX * sensitivity);  //camera follow x rotation
 
         Quaternion cameraRotation = Camera.main.transform.rotation;
 
@@ -170,6 +177,14 @@ public class MyController : MonoBehaviour
         }else if(_input.move.y < 0)
         {
             _controller.Move(Vector3.back * (targetSpeed * Time.deltaTime));
+        }
+        if (_input.move.x > 0)
+        {
+            _controller.Move(Vector3.left * (targetSpeed * Time.deltaTime));
+        }
+        else if (_input.move.x < 0)
+        {
+            _controller.Move( Vector3.right * (targetSpeed * Time.deltaTime));
         }
 
         // if there is no input, set the target speed to 0
@@ -247,23 +262,25 @@ public class MyController : MonoBehaviour
                            Quaternion cameraRotation = Camera.main.transform.rotation;
                         if(_input.move.x < 0 ){
                              Vector3 moveDirection = cameraRotation * Vector3.left;  //move forward
-                            _controller.Move(moveDirection * Time.deltaTime * dodgeValue);
                         //    Debug.Log("jump left test true ");
-                        /*    if (_hasAnimator)
+                            if (_hasAnimator)
                             {
-                                _animator.SetBool(_animIDDodge, true);
-                            }   */
-                        }else if (_input.move.x > 0 ) {
-                              Vector3 moveDirection = cameraRotation * Vector3.right;  //move forward
-                            _controller.Move(moveDirection * Time.deltaTime * dodgeValue);
+                                _animator.SetTrigger(_animIDDodgeL);
+                            }
+                    //  Debug.Log(moveDirection*dodgeValue);
+                    StartCoroutine(dodgeBeforeMove(moveDirection));
+                }
+                else if (_input.move.x > 0 ) {
+                    Vector3 moveDirection = cameraRotation * Vector3.right;  //move forward
                         //      Debug.Log("jump left test false ");
-                           /* if (_hasAnimator)
-                            {
-                                _animator.SetBool(_animIDDodge, true);
-                            }*/
-                        }
+                     if (_hasAnimator)
+                     {
+                        _animator.SetTrigger(_animIDDodgeR);
+                     }
+                    StartCoroutine(dodgeBeforeMove(moveDirection));
+                }
                     
-                }      
+            }      
 
                 // jump timeout
                 if (_jumpTimeoutDelta >= 0.0f)
@@ -302,20 +319,37 @@ public class MyController : MonoBehaviour
             }
         }
 
-        private void Dodge(float inputValue){
-            _input.jump = false;
-            if(inputValue<0){
-               // _controller.Move(new Vector3(0.0f, Mathf.Sqrt(JumpHeight * -2f * Gravity), 0.0f) * Time.deltaTime);
-                _controller.Move(new Vector3(10.0f, 0.0f, 0.0f) * Time.deltaTime);
+    IEnumerator dodgeBeforeMove(Vector3 moveDirection)
+    {
+        yield return new WaitForSeconds(0.2f);
+        _controller.Move(moveDirection * Time.deltaTime * dodgeValue);
 
-            }else {
-                _controller.Move(new Vector3(0.0f, 0.0f, 10.0f) * Time.deltaTime);
+    }
+
+
+    private void Attack(){
+
+        float autoAttack = _playerInput.actions["Attack"].ReadValue<float>();
+        // attack speed timeout
+        if (_attackTimeoutDelta >= 0.0f)
+        {
+            Debug.Log("reduce attack speed par time = " + _attackTimeoutDelta);
+            _attackTimeoutDelta -= Time.deltaTime;
+        }
+
+        if (autoAttack != 0 && _attackTimeoutDelta <= 0 )
+    {
+            Debug.Log("auto attack");
+            if (_hasAnimator)
+        {
+                Debug.LogWarning("auto attack anim");
+            _animator.SetTrigger(_animIDAutoAttack);
+                Debug.Log("reset timeout attack speed");
+                _attackTimeoutDelta = AttackSpeed;
             }
-        }
-
-        private void Attack(){
-            
-        }
+    }
+    
+    }
 
           private void OnFootstep(AnimationEvent animationEvent)
         {
