@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class MyController : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
 
     [Header("Player")]
@@ -74,6 +74,7 @@ public class MyController : MonoBehaviour
     private int _animIDJump;
     private int _animIDFreeFall;
     private int _animIDMotionSpeed;
+    private int _animIDDodge;
 
     private PlayerInput _playerInput;
 
@@ -83,6 +84,7 @@ public class MyController : MonoBehaviour
     public GameObject _mainCamera;
 
     public float sensitivity = 2.0f;
+    private float dodgeValue = 60f;
 
     private void Awake()
     {
@@ -111,8 +113,8 @@ public class MyController : MonoBehaviour
     {
         _hasAnimator = TryGetComponent(out _animator);
 
-       JumpAndGravity();
-       GroundedCheck();
+        JumpAndGravity();
+        GroundedCheck();
         Move();
     }
 
@@ -123,6 +125,7 @@ public class MyController : MonoBehaviour
         _animIDJump = Animator.StringToHash("Jump");
         _animIDFreeFall = Animator.StringToHash("FreeFall");
         _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+        _animIDDodge = Animator.StringToHash("Dodge");
     }
 
       private void GroundedCheck()
@@ -190,7 +193,6 @@ public class MyController : MonoBehaviour
             _speed = targetSpeed;
         }
 
-
         _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
         if (_animationBlend < 0.01f) _animationBlend = 0f;
 
@@ -204,6 +206,7 @@ public class MyController : MonoBehaviour
 
      private void JumpAndGravity()
         {
+            Debug.Log("jump gravity ");
             if (Grounded)
             {
                 // reset the fall timeout timer
@@ -221,10 +224,11 @@ public class MyController : MonoBehaviour
                 {
                     _verticalVelocity = -2f;
                 }
-
+                Debug.Log("test basic ");
                 // Jump
                 if (_input.jump && _jumpTimeoutDelta <= 0.0f )
                 {
+                    Debug.Log("test test test ");
                     if(_input.move.x == 0){
                         // the square root of H * -2 * G = how much velocity needed to reach desired height
                         _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
@@ -232,16 +236,30 @@ public class MyController : MonoBehaviour
                         if (_hasAnimator)
                         {
                             _animator.SetBool(_animIDJump, true);
-                        }   
-                    }else {
+                        }  
+                        Debug.Log("test jump basic ");
+                    }else 
                        //Dodge(_input.move.x);
+                          _input.jump = false;
+                           Quaternion cameraRotation = Camera.main.transform.rotation;
                         if(_input.move.x < 0 ){
-                              _input.jump = false;
-                            _controller.Move(new Vector3(0.0f, Mathf.Sqrt(JumpHeight * -2f * Gravity), 0.0f) * Time.deltaTime);
-                             _controller.Move(new Vector3(10.0f, 0.0f, 0.0f) * Time.deltaTime);
-
+                            Vector3 moveDirection = cameraRotation * Vector3.left;  //move forward
+                            _controller.Move(moveDirection * Time.deltaTime * dodgeValue);
+                            Debug.Log("test dodge -------------------- ");
+                            if (_hasAnimator)
+                            {
+                                _animator.SetBool(_animIDDodge, true);
+                            }
+                        }else {
+                            Vector3 moveDirection = cameraRotation * Vector3.right;  //move forward
+                            _controller.Move(moveDirection * Time.deltaTime * dodgeValue);
+                            Debug.Log("test dodge right ");
+                            if (_hasAnimator)
+                            {
+                                _animator.SetBool(_animIDDodge, false);
+                            }
                         }
-                    }
+                    
                 }      
 
                 // jump timeout
