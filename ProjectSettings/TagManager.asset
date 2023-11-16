@@ -17,6 +17,7 @@ TagManager:
   - NasMesh
   - Player
   - FirstRoomNasMesh
+  - Enemy
   - 
   - 
   - 
@@ -39,7 +40,6 @@ TagManager:
   - 
   - 
   - 
-  - Player
   m_SortingLayers:
   - name: Default
     uniqueID: 0
