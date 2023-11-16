@@ -32,7 +32,7 @@ public class ZombieMovement : MonoBehaviour
         }
         else
         {
-            if (patrolPoints != null && patrolPoints.Count >= 2)
+            if (patrolPoints is { Count: >= 2 })
             {
                 _currentPatrolIndex = 0;
                 SetDestination();
