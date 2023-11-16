@@ -67,7 +67,9 @@ public class EnemyAiPatrol : MonoBehaviour
     }
 
     void Attack() {
-        animator.SetTrigger("Attack");
-        agent.SetDestination(transform.position);
+        if(!animator.GetCurrentAnimatorStateInfo(0).IsName("Attack(1)")) {
+            animator.SetTrigger("Attack");
+            agent.SetDestination(transform.position);
+        }
     }
 }
