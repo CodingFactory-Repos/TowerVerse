@@ -180,11 +180,11 @@ public class MyController : MonoBehaviour
         }
         if (_input.move.x > 0)
         {
-            _controller.Move(Vector3.left * (targetSpeed * Time.deltaTime));
+            _controller.Move(Vector3.right * (targetSpeed * Time.deltaTime));
         }
         else if (_input.move.x < 0)
         {
-            _controller.Move( Vector3.right * (targetSpeed * Time.deltaTime));
+            _controller.Move( Vector3.left * (targetSpeed * Time.deltaTime));
         }
 
         // if there is no input, set the target speed to 0
