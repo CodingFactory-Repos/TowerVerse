@@ -4,24 +4,41 @@ using UnityEngine.AI;
 
 public class CharacterStats : MonoBehaviour
 {
-    [SerializeField] private int currentHealth;
-    [SerializeField] private int speed;
-    [SerializeField] private int attackDamage;
-    [SerializeField] private float attackRange;
-    [SerializeField] private float attackSpeed;
+
+    [SerializeField] public float maxHealth;
+     public float currentHealth;
+    [SerializeField] public float walkSpeed;
+    [SerializeField] public float runSpeed;
+    [SerializeField] public float attackDamage;
+    [SerializeField] public float attackRange;
+    [SerializeField] public float attackSpeed;
     [SerializeField] private bool isEnnemy;
 
     private Animator _animator;
 
     private NavMeshAgent _navMeshAgent;
 
+    public Health healthBar;
+
     // Start is called before the first frame update
     private void Start()
     {
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
+        if (isEnnemy) _navMeshAgent.speed = walkSpeed;
+        currentHealth = maxHealth;
+        setValue();
+    }
 
-        if (isEnnemy) _navMeshAgent.speed = speed;
+    private void setValue()
+    {
+        var main = MainHolder.instance;
+            maxHealth = main._maxHealth;
+            attackDamage = main._damage;
+            walkSpeed = main._walkSpeed;
+            attackSpeed = main._attackSpeed;
+            attackRange = main._attackRange;
+            runSpeed = main._runSpeed;
     }
 
 
@@ -36,16 +53,17 @@ public class CharacterStats : MonoBehaviour
         Die();
     }
 
-    private void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
+        Debug.Log("aie : -" +  damage);
         currentHealth -= damage;
+        healthBar.UpdateHealthBar(maxHealth, currentHealth);
     }
 
     private void Die()
     {
         if (currentHealth > 0) return;
-        var dead = Animator.StringToHash("Dead");
-        _animator.SetBool(dead, true);
+       // _animator.SetTrigger("Dead");
         StartCoroutine(DestroyCouroutine());
     }
 

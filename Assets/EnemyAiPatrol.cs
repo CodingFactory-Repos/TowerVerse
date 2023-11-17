@@ -97,8 +97,6 @@ public class EnemyAiPatrol : MonoBehaviour
             SetDestination();
         }
 
-        //Debug.Log(playerInAttackRange + " " + playerInSight + " " + _leftPatrolWaypoint);
-
         if (!playerInSight && !playerInAttackRange && _leftPatrolWaypoint) Patrol();
         if (playerInSight && !playerInAttackRange) Chase();
         if (playerInSight && playerInAttackRange) Attack();
@@ -125,6 +123,7 @@ public class EnemyAiPatrol : MonoBehaviour
     {
         if (patrolPoints == null) return;
         var targetVector = patrolPoints[_currentPatrolIndex].transform.position;
+        transform.LookAt(targetVector);
         agent.SetDestination(targetVector);
         _travelling = true;
     }
@@ -152,6 +151,7 @@ public class EnemyAiPatrol : MonoBehaviour
 
     private void Chase()
     {
+        transform.LookAt(player.transform);
         agent.SetDestination(player.transform.position);
         _leftPatrolWaypoint = true;
     }
@@ -160,7 +160,13 @@ public class EnemyAiPatrol : MonoBehaviour
     {
         _leftPatrolWaypoint = true;
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("Attack(1)")) return;
+        transform.LookAt(player.transform);
         animator.SetTrigger("Attack");
         agent.SetDestination(transform.position);
+    }
+
+    private void OnDrawGizmos()
+    {
+        
     }
 }

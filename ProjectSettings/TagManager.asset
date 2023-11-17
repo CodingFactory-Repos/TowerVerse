@@ -7,6 +7,8 @@ TagManager:
   - CinemachineTarget
   - Weapon
   - enemies
+  - HealthBar
+  - Spawn
   - switchScene
   layers:
   - Default

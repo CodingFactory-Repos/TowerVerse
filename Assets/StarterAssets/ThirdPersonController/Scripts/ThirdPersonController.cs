@@ -1,4 +1,5 @@
-﻿ using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
 #endif
@@ -16,13 +17,13 @@ namespace StarterAssets
     {
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
-        public float MoveSpeed = 2.0f;
+        public float MoveSpeed;
 
         [Tooltip("Sprint speed of the character in m/s")]
-        public float SprintSpeed = 5.335f;
+        public float SprintSpeed;
 
         [Tooltip("Attack speed of the character in m/s")]
-        public float AttackSpeed = 2;
+        public float AttackSpeed;
 
         [Tooltip("How fast the character turns to face movement direction")]
         [Range(0.0f, 0.3f)]
@@ -114,8 +115,10 @@ namespace StarterAssets
         private GameObject _mainCamera;
 
         private const float _threshold = 0.01f;
-
+        private bool canAttack = true;
         private bool _hasAnimator;
+
+        private CharacterStats playerStates;
 
         private bool IsCurrentDeviceMouse
         {
@@ -141,6 +144,7 @@ namespace StarterAssets
 
         private void Start()
         {
+          
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
             weapon = GetComponentInChildren<DamageDealer>();
             _hasAnimator = TryGetComponent(out _animator);
@@ -157,6 +161,16 @@ namespace StarterAssets
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
+
+       
+        }
+
+        public void setPlayerState()
+        {
+            playerStates = GetComponent<CharacterStats>();
+            MoveSpeed = playerStates.walkSpeed;
+            SprintSpeed = playerStates.runSpeed;
+            AttackSpeed = playerStates.attackSpeed;
         }
 
         private void Update()
@@ -359,25 +373,26 @@ namespace StarterAssets
 
         private void Attack()
         {
-
             float autoAttack = _playerInput.actions["Attack"].ReadValue<float>();
-            // attack speed timeout
-            if (_attackTimeoutDelta >= 0.0f)
-            {
-                _attackTimeoutDelta -= Time.deltaTime;
-            }
 
-            if (autoAttack != 0 && _attackTimeoutDelta <= 0)
+            if (autoAttack != 0 && canAttack)
             {
+                canAttack = false;
                 weapon.StartDealDamage();
                 if (_hasAnimator)
                 {
                     _animator.SetTrigger(_animIDAutoAttack);
-                    _attackTimeoutDelta = AttackSpeed;
+                    StartCoroutine(resetAuto());
                 }
             }
-            //weapon.EndDealDamage();
 
+        }
+
+        IEnumerator resetAuto()
+        {
+            yield return new  WaitForSeconds(1f);
+            weapon.EndDealDamage();
+            canAttack = true;
         }
 
         private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
@@ -385,20 +400,6 @@ namespace StarterAssets
             if (lfAngle < -360f) lfAngle += 360f;
             if (lfAngle > 360f) lfAngle -= 360f;
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
-            Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
-
-            if (Grounded) Gizmos.color = transparentGreen;
-            else Gizmos.color = transparentRed;
-
-            // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
-            Gizmos.DrawSphere(
-                new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z),
-                GroundedRadius);
         }
 
         private void OnFootstep(AnimationEvent animationEvent)
