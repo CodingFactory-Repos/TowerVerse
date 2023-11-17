@@ -41,12 +41,11 @@ public class EnemyAiPatrol : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        player = GameObject.Find("Player");
+        player = GameObject.Find("Player") ?? GameObject.Find("Player Variant") ?? GameObject.Find("PlayerArmature");
 
         agent = GetComponent<NavMeshAgent>();
 
         animator = GetComponent<Animator>();
-
         if (agent == null)
         {
             Debug.LogError("NavMeshAgent component not found" + gameObject.name);
@@ -60,7 +59,7 @@ public class EnemyAiPatrol : MonoBehaviour
             }
             else
             {
-                Debug.Log("Insufficient patrol points for basic patrolling behavior.");
+                _leftPatrolWaypoint = true;
             }
         }
     }
@@ -74,7 +73,6 @@ public class EnemyAiPatrol : MonoBehaviour
 
         if (!playerInSight && !playerInAttackRange && !_leftPatrolWaypoint)
         {
-            Debug.Log("waypoint");
             if (_travelling && agent.remainingDistance <= 1.0f)
             {
                 _travelling = false;
@@ -99,7 +97,7 @@ public class EnemyAiPatrol : MonoBehaviour
             SetDestination();
         }
 
-        Debug.Log(playerInAttackRange + " " + playerInSight + " " + _leftPatrolWaypoint);
+        //Debug.Log(playerInAttackRange + " " + playerInSight + " " + _leftPatrolWaypoint);
 
         if (!playerInSight && !playerInAttackRange && _leftPatrolWaypoint) Patrol();
         if (playerInSight && !playerInAttackRange) Chase();
@@ -108,7 +106,6 @@ public class EnemyAiPatrol : MonoBehaviour
 
     private void Patrol()
     {
-        Debug.Log("Patrol");
         if (!walkpointSet) SearchForDestination();
         if (walkpointSet) agent.SetDestination(destPoint);
         if (Vector3.Distance(transform.position, destPoint) < 10) walkpointSet = false;
