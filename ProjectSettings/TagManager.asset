@@ -9,6 +9,7 @@ TagManager:
   - enemies
   - HealthBar
   - Spawn
+  - switchScene
   layers:
   - Default
   - TransparentFX
