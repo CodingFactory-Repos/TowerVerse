@@ -41,7 +41,7 @@ public class EnemyAiPatrol : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        player = GameObject.Find("Player");
+        player = GameObject.Find("Player") ?? GameObject.Find("Player Variant") ?? GameObject.Find("PlayerArmature");
 
         agent = GetComponent<NavMeshAgent>();
 
@@ -106,7 +106,6 @@ public class EnemyAiPatrol : MonoBehaviour
 
     private void Patrol()
     {
-        Debug.Log(agent + "Patrol");
         if (!walkpointSet) SearchForDestination();
         if (walkpointSet) agent.SetDestination(destPoint);
         if (Vector3.Distance(transform.position, destPoint) < 10) walkpointSet = false;
