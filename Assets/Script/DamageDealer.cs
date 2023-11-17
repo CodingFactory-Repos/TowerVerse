@@ -24,7 +24,7 @@ public class DamageDealer : MonoBehaviour
         {
             RaycastHit hit;
             int layerMask = 1 << 9;
-            Debug.Log("Start can deal damage ");
+         //   Debug.Log("Start can deal damage ");
             if (Physics.Raycast(transform.position,-transform.up, out hit, weaponLenght, layerMask)) {
                 Debug.Log(hit.ToString());
                 if(hit.transform.TryGetComponent(out EnemyController enemy) && !hasDealtDamage.Contains(hit.transform.gameObject))

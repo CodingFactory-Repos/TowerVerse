@@ -4,24 +4,28 @@ using UnityEngine.AI;
 
 public class CharacterStats : MonoBehaviour
 {
-    [SerializeField] private int currentHealth;
-    [SerializeField] private int speed;
-    [SerializeField] private int attackDamage;
-    [SerializeField] private float attackRange;
-    [SerializeField] private float attackSpeed;
+
+    [SerializeField] public float maxHealth;
+     public float currentHealth;
+    [SerializeField] public int speed;
+    [SerializeField] public int attackDamage;
+    [SerializeField] public float attackRange;
+    [SerializeField] public float attackSpeed;
     [SerializeField] private bool isEnnemy;
 
     private Animator _animator;
 
     private NavMeshAgent _navMeshAgent;
 
+    public Health healthBar;
+
     // Start is called before the first frame update
     private void Start()
     {
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
-
         if (isEnnemy) _navMeshAgent.speed = speed;
+        currentHealth = maxHealth;
     }
 
 
@@ -33,12 +37,14 @@ public class CharacterStats : MonoBehaviour
 
     private void LateUpdate()
     {
-        Die();
+        //Die();
     }
 
-    private void TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {
+        Debug.Log("aie : -" +  damage);
         currentHealth -= damage;
+        healthBar.UpdateHealthBar(maxHealth, currentHealth);
     }
 
     private void Die()
