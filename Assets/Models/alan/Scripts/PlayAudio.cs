@@ -29,7 +29,7 @@ public class PlayAudio : MonoBehaviour
             // Faire tourner le texte vers la caméra horizontalement
             canvas.transform.LookAt(Camera.main.transform);
 
-            // Faire tourner le texte à l'envers
+            // Faire tourner le texte vers la caméra verticalement
             canvas.transform.Rotate(0, 180, 0);
         } else {
             // Cacher le texte
