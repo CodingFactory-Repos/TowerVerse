@@ -24,7 +24,7 @@ public class EnemyController : MonoBehaviour
     // public Collider _RightHand;
     public LayerMask layerMask;
 
-    private void OnTriggerEnter(Collider other)
+  /*  private void OnTriggerEnter(Collider other)
     {
         if ((layerMask & 1 << other.gameObject.layer) == 1 << other.gameObject.layer)
         {
@@ -32,7 +32,7 @@ public class EnemyController : MonoBehaviour
             CharacterStats player = other.gameObject.GetComponentInParent<CharacterStats>();
             player.TakeDamage(attackDamage);
         }
-    }
+    }*/
 
     // Start is called before the first frame update
     void Start()
@@ -57,7 +57,6 @@ public class EnemyController : MonoBehaviour
 
     public void StartDealDamage()
     {
-        Debug.Log("toto");
         GetComponentInChildren<EnemyDamageDealer>().StartDealDamagetest();
     }
 

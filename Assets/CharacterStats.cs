@@ -7,8 +7,9 @@ public class CharacterStats : MonoBehaviour
 
     [SerializeField] public float maxHealth;
      public float currentHealth;
-    [SerializeField] public int speed;
-    [SerializeField] public int attackDamage;
+    [SerializeField] public float walkSpeed;
+    [SerializeField] public float runSpeed;
+    [SerializeField] public float attackDamage;
     [SerializeField] public float attackRange;
     [SerializeField] public float attackSpeed;
     [SerializeField] private bool isEnnemy;
@@ -24,8 +25,20 @@ public class CharacterStats : MonoBehaviour
     {
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
-        if (isEnnemy) _navMeshAgent.speed = speed;
+        if (isEnnemy) _navMeshAgent.speed = walkSpeed;
         currentHealth = maxHealth;
+        setValue();
+    }
+
+    private void setValue()
+    {
+        var main = MainHolder.instance;
+            maxHealth = main._maxHealth;
+            attackDamage = main._damage;
+            walkSpeed = main._walkSpeed;
+            attackSpeed = main._attackSpeed;
+            attackRange = main._attackRange;
+            runSpeed = main._runSpeed;
     }
 
 
@@ -37,10 +50,10 @@ public class CharacterStats : MonoBehaviour
 
     private void LateUpdate()
     {
-        //Die();
+        Die();
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         Debug.Log("aie : -" +  damage);
         currentHealth -= damage;
@@ -50,8 +63,7 @@ public class CharacterStats : MonoBehaviour
     private void Die()
     {
         if (currentHealth > 0) return;
-        var dead = Animator.StringToHash("Dead");
-        _animator.SetBool(dead, true);
+       // _animator.SetTrigger("Dead");
         StartCoroutine(DestroyCouroutine());
     }
 

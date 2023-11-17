@@ -8,6 +8,7 @@ TagManager:
   - Weapon
   - enemies
   - HealthBar
+  - Spawn
   layers:
   - Default
   - TransparentFX

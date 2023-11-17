@@ -11,11 +11,13 @@ public class EnemyDamageDealer : MonoBehaviour
     public float weaponLenght;
     public float weaponDamage;
 
+    public LayerMask layerMask;
+
 
     // Start is called before the first frame update
     void Start()
     {
-        canDealDamage = true;
+        canDealDamage = false;
         hasDealtDamage = false;
     }
 
@@ -26,21 +28,26 @@ public class EnemyDamageDealer : MonoBehaviour
         {
             RaycastHit hit;
 
-            int layerMask = 1 << 8;
+           // int layerMask = 1 << 7;
 
     
             if (Physics.Raycast(transform.position, -transform.up, out hit, weaponLenght, layerMask))
             {
-                //    enemy.TakeDamage(weaponDamage);
-                Debug.LogWarning("enemy has dealt damage");
-                hasDealtDamage = true;
+                Debug.LogWarning(hit.transform.gameObject);
+                if (hit.transform.TryGetComponent(out CharacterStats playerState) )
+                {
+                    Debug.LogWarning(weaponDamage);
+                    playerState.TakeDamage(weaponDamage);
+                    Debug.LogWarning("enemy has dealt damage");
+                    hasDealtDamage = true;
+                }
             }
         }
     }
 
     public void StartDealDamagetest()
     {
-        Debug.Log("test");
+        Debug.Log("toto");
         canDealDamage = true;
         hasDealtDamage = false;
     }

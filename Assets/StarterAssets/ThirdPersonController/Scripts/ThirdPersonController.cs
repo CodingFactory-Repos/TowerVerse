@@ -144,7 +144,7 @@ namespace StarterAssets
 
         private void Start()
         {
-            playerStates = GetComponent<CharacterStats>();
+          
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
             weapon = GetComponentInChildren<DamageDealer>();
             _hasAnimator = TryGetComponent(out _animator);
@@ -162,8 +162,14 @@ namespace StarterAssets
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
 
-            MoveSpeed = playerStates.speed;
-            SprintSpeed = playerStates.speed*1.5f;
+       
+        }
+
+        public void setPlayerState()
+        {
+            playerStates = GetComponent<CharacterStats>();
+            MoveSpeed = playerStates.walkSpeed;
+            SprintSpeed = playerStates.runSpeed;
             AttackSpeed = playerStates.attackSpeed;
         }
 
