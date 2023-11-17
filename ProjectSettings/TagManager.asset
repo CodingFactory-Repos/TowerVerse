@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - CinemachineTarget
+  - Weapon
+  - enemies
+  - switchScene
   layers:
   - Default
   - TransparentFX
@@ -15,7 +18,7 @@ TagManager:
   - NasMesh
   - Player
   - FirstRoomNasMesh
-  - 
+  - Enemy
   - 
   - 
   - 

@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/UnityTechnologies.meta
+guid: ac6eefd3d57086a43800496fb2f0dc63
+========
 guid: f54d1bd14bd3ca042bd867b519fee8cc
+>>>>>>>> develop:Assets/TextMesh Pro.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
