@@ -21,6 +21,9 @@ namespace StarterAssets
         [Tooltip("Sprint speed of the character in m/s")]
         public float SprintSpeed = 5.335f;
 
+        [Tooltip("Attack speed of the character in m/s")]
+        public float AttackSpeed = 2;
+
         [Tooltip("How fast the character turns to face movement direction")]
         [Range(0.0f, 0.3f)]
         public float RotationSmoothTime = 0.12f;
@@ -75,6 +78,8 @@ namespace StarterAssets
         [Tooltip("For locking the camera position on all axis")]
         public bool LockCameraPosition = false;
 
+        public DamageDealer weapon;
+
         // cinemachine
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
@@ -90,6 +95,7 @@ namespace StarterAssets
         // timeout deltatime
         private float _jumpTimeoutDelta;
         private float _fallTimeoutDelta;
+        private float _attackTimeoutDelta;
 
         // animation IDs
         private int _animIDSpeed;
@@ -97,6 +103,7 @@ namespace StarterAssets
         private int _animIDJump;
         private int _animIDFreeFall;
         private int _animIDMotionSpeed;
+        private int _animIDAutoAttack;
 
 #if ENABLE_INPUT_SYSTEM 
         private PlayerInput _playerInput;
@@ -135,7 +142,7 @@ namespace StarterAssets
         private void Start()
         {
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
-            
+            weapon = GetComponentInChildren<DamageDealer>();
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
@@ -159,6 +166,7 @@ namespace StarterAssets
             JumpAndGravity();
             GroundedCheck();
             Move();
+            Attack();
         }
 
         private void LateUpdate()
@@ -173,6 +181,7 @@ namespace StarterAssets
             _animIDJump = Animator.StringToHash("Jump");
             _animIDFreeFall = Animator.StringToHash("FreeFall");
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+            _animIDAutoAttack = Animator.StringToHash("AutoAttack");
         }
 
         private void GroundedCheck()
@@ -346,6 +355,29 @@ namespace StarterAssets
             {
                 _verticalVelocity += Gravity * Time.deltaTime;
             }
+        }
+
+        private void Attack()
+        {
+
+            float autoAttack = _playerInput.actions["Attack"].ReadValue<float>();
+            // attack speed timeout
+            if (_attackTimeoutDelta >= 0.0f)
+            {
+                _attackTimeoutDelta -= Time.deltaTime;
+            }
+
+            if (autoAttack != 0 && _attackTimeoutDelta <= 0)
+            {
+                weapon.StartDealDamage();
+                if (_hasAnimator)
+                {
+                    _animator.SetTrigger(_animIDAutoAttack);
+                    _attackTimeoutDelta = AttackSpeed;
+                }
+            }
+            //weapon.EndDealDamage();
+
         }
 
         private static float ClampAngle(float lfAngle, float lfMin, float lfMax)

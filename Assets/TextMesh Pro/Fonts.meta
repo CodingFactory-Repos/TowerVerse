@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/UnityTechnologies/SpaceRobotKyle.meta
+guid: f65f9b9c8ad082a48a077e25bc5f5ad0
+========
 guid: 6ab70aee4d56447429c680537fbf93ed
+>>>>>>>> develop:Assets/TextMesh Pro/Fonts.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
