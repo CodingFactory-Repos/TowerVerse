@@ -15,6 +15,7 @@ public class PlayAudio : MonoBehaviour
     public TextMeshProUGUI KeyboardKeyText; // Le texte à afficher
     public Image ControllerKeyImage; // Le texte à afficher
     private Canvas canvas; // Le canvas contenant le texte
+    private AudioSource audioSource; // Le AudioSource
 
     void Update()
     {
@@ -30,6 +31,8 @@ public class PlayAudio : MonoBehaviour
             // Vérifier si l'utilisateur a appuyé sur la touche spécifiée
             if (Input.GetKeyDown(keyboardKey) || Input.GetKeyDown(controllerKey))
             {
+                // Jouer la fonction PlayAudio
+                GetComponent<AudioSource>().Play();
             }
         } else
         {
