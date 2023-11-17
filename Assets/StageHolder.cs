@@ -13,7 +13,14 @@ public class StageHolder : MonoBehaviour
             {
                 MainHolder.instance.startStage(2);
             }
-   
+            else if (MainHolder.instance.currentScene == 2)
+            {
+                MainHolder.instance.startStage(3);
+            }
+            else if (MainHolder.instance.currentScene == 3)
+            {
+                MainHolder.instance.startStage(4);
+            }
         }
     }
 }
