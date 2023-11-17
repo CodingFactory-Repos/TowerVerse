@@ -13,6 +13,7 @@ public class MainHolder : MonoBehaviour
     private GameObject player;
     public GameObject spawnPoint;
     public bool firstScene;
+    public int currentScene=0;
 
     [Header("player State")]
     [SerializeField] private float maxHealth;
@@ -53,6 +54,7 @@ public class MainHolder : MonoBehaviour
 
     public void startStage(int index)
     {
+        currentScene = index;
         if (index == 1)
         {
             setValue();
